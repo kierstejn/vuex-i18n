@@ -11,7 +11,7 @@ fs.symlink('../src', './src', () => {
 
 	// use rollup to bundle the content
 	console.log('- bundle code');
-	exec('yarn run rollup', (error) => {
+	exec('npm run rollup', (error) => {
 
 		if (error) {
 			console.error(`error: ${error}`);
@@ -20,7 +20,7 @@ fs.symlink('../src', './src', () => {
 
 		// minify the code with uglifyjs
 		console.log('- minify code');
-		exec('yarn run minify', (error2) => {
+		exec('npm run minify', (error2) => {
 
 			if (error2) {
 				console.error(`error: ${error2}`);

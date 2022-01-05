@@ -1,18 +1,6 @@
 'use strict';
 
-function _typeof(obj) {
-  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-    _typeof = function (obj) {
-      return typeof obj;
-    };
-  } else {
-    _typeof = function (obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-    };
-  }
-
-  return _typeof(obj);
-}
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 /* vuex-i18n-store defines a vuex module to store locale translations. Make sure
 ** to also include the file vuex-i18n.js to enable easy access to localized
@@ -388,20 +376,23 @@ var plurals = {
   }
 };
 
+function _typeof$1(obj) { "@babel/helpers - typeof"; return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof$1(obj); }
+
+function _readOnlyError(name) { throw new TypeError("\"" + name + "\" is read-only"); }
+
 var VuexI18nPlugin = {}; // internationalization plugin for vue js using vuex
 
-VuexI18nPlugin.install = function install(Vue, store, config) {
-  // TODO: remove this block for next major update (API break)
+VuexI18nPlugin.install = function install(app, options) {
+  var store = options.store,
+      config = options.config; // TODO: remove this block for next major update (API break)
+
   if (typeof arguments[2] === 'string' || typeof arguments[3] === 'string') {
     console.warn('i18n: Registering the plugin vuex-i18n with a string for `moduleName` or `identifiers` is deprecated. Use a configuration object instead.', 'https://github.com/dkfbasel/vuex-i18n#setup');
-    config = {
-      moduleName: arguments[2],
-      identifiers: arguments[3]
-    };
+    _readOnlyError("config");
   } // merge default options with user supplied options
 
 
-  config = Object.assign({
+  Object.assign({
     warnings: true,
     moduleName: 'i18n',
     identifiers: ['{', '}'],
@@ -409,7 +400,7 @@ VuexI18nPlugin.install = function install(Vue, store, config) {
     translateFilterName: 'translate',
     translateInFilterName: 'translateIn',
     onTranslationNotFound: function onTranslationNotFound() {}
-  }, config); // define module name and identifiers as constants to prevent any changes
+  }, config), _readOnlyError("config"); // define module name and identifiers as constants to prevent any changes
 
   var moduleName = config.moduleName;
   var identifiers = config.identifiers;
@@ -434,15 +425,15 @@ VuexI18nPlugin.install = function install(Vue, store, config) {
   if (store.state.hasOwnProperty(moduleName) === false) {
     console.error('i18n: i18n vuex module is not correctly initialized. Please check the module name:', moduleName); // always return the key if module is not initialized correctly
 
-    Vue.prototype.$i18n = function (key) {
+    app.config.globalProperties.$i18n = function (key) {
       return key;
     };
 
-    Vue.prototype.$getLanguage = function () {
+    app.config.globalProperties.$getLanguage = function () {
       return null;
     };
 
-    Vue.prototype.$setLanguage = function () {
+    app.config.globalProperties.$setLanguage = function () {
       console.error('i18n: i18n vuex module is not correctly initialized');
     };
 
@@ -558,15 +549,6 @@ VuexI18nPlugin.install = function install(Vue, store, config) {
   }; // add a filter function to translate in a given locale (i.e. {{ 'something' | translateIn('en') }})
 
 
-  var translateInLanguageFilter = function translateInLanguageFilter(key, locale) {
-    for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-      args[_key - 2] = arguments[_key];
-    }
-
-    return translateInLanguage.apply(void 0, [locale, key].concat(args));
-  }; // check if the given key exists in the current locale
-
-
   var checkKeyExists = function checkKeyExists(key) {
     var scope = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'fallback';
     // get the current language from the store
@@ -668,7 +650,7 @@ VuexI18nPlugin.install = function install(Vue, store, config) {
   }; // register vue prototype methods
 
 
-  Vue.prototype.$i18n = {
+  app.config.globalProperties.$i18n = {
     locale: getLocale,
     locales: getLocales,
     set: setLocale,
@@ -682,28 +664,29 @@ VuexI18nPlugin.install = function install(Vue, store, config) {
     translateIn: translateInLanguage,
     exists: phaseOutExistsFn
   }; // register global methods
+  // Vue.i18n = {
+  // 	locale: getLocale,
+  // 	locales: getLocales,
+  // 	set: setLocale,
+  // 	add: addLocale,
+  // 	replace: replaceLocale,
+  // 	remove: removeLocale,
+  // 	fallback: setFallbackLocale,
+  // 	translate: translate,
+  // 	translateIn: translateInLanguage,
+  // 	localeExists: checkLocaleExists,
+  // 	keyExists: checkKeyExists,
+  // 	exists: phaseOutExistsFn
+  // };
+  // register the translation function on the vue instance directly
 
-  Vue.i18n = {
-    locale: getLocale,
-    locales: getLocales,
-    set: setLocale,
-    add: addLocale,
-    replace: replaceLocale,
-    remove: removeLocale,
-    fallback: setFallbackLocale,
-    translate: translate,
-    translateIn: translateInLanguage,
-    localeExists: checkLocaleExists,
-    keyExists: checkKeyExists,
-    exists: phaseOutExistsFn
-  }; // register the translation function on the vue instance directly
+  app.config.globalProperties.$t = translate; // register the specific language translation function on the vue instance directly
 
-  Vue.prototype.$t = translate; // register the specific language translation function on the vue instance directly
-
-  Vue.prototype.$tlang = translateInLanguage; // register a filter function for translations
-
-  Vue.filter(translateFilterName, translate);
-  Vue.filter(translateInFilterName, translateInLanguageFilter);
+  app.config.globalProperties.$tlang = translateInLanguage; // register a filter function for translations
+  // app.config.globalProperties.$filter = {
+  // 	translateFilterName: translate,
+  // 	translateInFilterName: translateInLanguageFilter
+  // }
 }; // renderFn will initialize a function to render the variable substitutions in
 // the translation string. identifiers specify the tags will be used to find
 // variable substitutions, i.e. {test} or {{test}}, note that we are using a
@@ -758,18 +741,18 @@ var renderFn = function renderFn(identifiers) {
     var pluralization = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
     // get the type of the property
-    var objType = _typeof(translation);
+    var objType = _typeof$1(translation);
 
-    var pluralizationType = _typeof(pluralization);
+    var pluralizationType = _typeof$1(pluralization);
 
     var resolvePlaceholders = function resolvePlaceholders() {
       if (isArray$1(translation)) {
         // replace the placeholder elements in all sub-items
         return translation.map(function (item) {
-          return replace(item, replacements, false);
+          return replace(item, replacements);
         });
       } else if (objType === 'string') {
-        return replace(translation, replacements, true);
+        return replace(translation, replacements);
       }
     }; // return translation item directly
 
