@@ -11,9 +11,8 @@ let VuexI18nPlugin = {};
 
 // internationalization plugin for vue js using vuex
 VuexI18nPlugin.install = function install(app, options) {
-	let {store} = options;
+	let {store, config} = options;
 	// TODO: remove this block for next major update (API break)
-	let config = {};
 	if (typeof arguments[2] === 'string' || typeof arguments[3] === 'string') {
 		console.warn('i18n: Registering the plugin vuex-i18n with a string for `moduleName` or `identifiers` is deprecated. Use a configuration object instead.', 'https://github.com/dkfbasel/vuex-i18n#setup');
 		config = {
