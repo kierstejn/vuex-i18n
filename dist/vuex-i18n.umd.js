@@ -382,21 +382,23 @@
 
 	function _typeof$1(obj) { "@babel/helpers - typeof"; return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof$1(obj); }
 
-	function _readOnlyError(name) { throw new TypeError("\"" + name + "\" is read-only"); }
-
 	var VuexI18nPlugin = {}; // internationalization plugin for vue js using vuex
 
 	VuexI18nPlugin.install = function install(app, options) {
-	  var store = options.store,
-	      config = options.config; // TODO: remove this block for next major update (API break)
+	  var store = options.store; // TODO: remove this block for next major update (API break)
+
+	  var config = {};
 
 	  if (typeof arguments[2] === 'string' || typeof arguments[3] === 'string') {
 	    console.warn('i18n: Registering the plugin vuex-i18n with a string for `moduleName` or `identifiers` is deprecated. Use a configuration object instead.', 'https://github.com/dkfbasel/vuex-i18n#setup');
-	    _readOnlyError("config");
+	    config = {
+	      moduleName: arguments[2],
+	      identifiers: arguments[3]
+	    };
 	  } // merge default options with user supplied options
 
 
-	  Object.assign({
+	  config = Object.assign({
 	    warnings: true,
 	    moduleName: 'i18n',
 	    identifiers: ['{', '}'],
@@ -404,7 +406,7 @@
 	    translateFilterName: 'translate',
 	    translateInFilterName: 'translateIn',
 	    onTranslationNotFound: function onTranslationNotFound() {}
-	  }, config), _readOnlyError("config"); // define module name and identifiers as constants to prevent any changes
+	  }, config); // define module name and identifiers as constants to prevent any changes
 
 	  var moduleName = config.moduleName;
 	  var identifiers = config.identifiers;
